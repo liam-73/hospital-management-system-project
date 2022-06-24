@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // routers
-const hospitalRouter = require("../src/routes/hospital");
+const hospitalRouter = require("./routes/hospital");
 
 // error handler
 // const { errorHandler } = require("../src/handlers/error");

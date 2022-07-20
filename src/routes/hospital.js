@@ -26,8 +26,6 @@ const upload = multer({ storage, fileFilter, limits: { fileSize: 1024 * 1024 * 1
 
 router.post( "/profile", upload.single('profile'), hospitalHandlers.createHospitalProfile );
 
-router.post( "/login", hospitalHandlers.login );
-
 router.get( "/profile", auth, hospitalHandlers.getProfile );
 
 router.patch( "/profile", upload.single('profile'), auth, hospitalHandlers.editProfile );

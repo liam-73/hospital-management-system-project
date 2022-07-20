@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// schemas
+const Appointment = require('./appointment');
+const Transaction = require("./transaction");
+const User = require("./user");
+const Admin = require("./admin")
+
 const hospitalSchema = new mongoose.Schema(
     {
         name: {
@@ -14,10 +20,9 @@ const hospitalSchema = new mongoose.Schema(
             required: true,
         },
 
-        password: {
+        phone_number: {
             type: String,
             trim: true,
-            required: true
         },
 
         address: {
@@ -26,12 +31,46 @@ const hospitalSchema = new mongoose.Schema(
 
         profile: {
             type: String
+        },
+
+        description: {
+            type: String
         }
     },
     {
         timestamps: true
     }
 );
+
+hospitalSchema.virtual( "users", {
+    ref: "User",
+    localField: "_id",
+    foreignField: "hospital"
+});
+
+hospitalSchema.virtual( "admins", {
+    ref: "Admin",
+    localField: '_id',
+    foreignField: 'hospital'
+});
+
+hospitalSchema.virtual( "appointments", {
+    ref: "Appointment",
+    localField: "_id",
+    foreignField: "hospital"
+});
+
+hospitalSchema.virtual( "transactions", {
+    ref: "Transaction",
+    localField: "_id",
+    foreignField: "hospital"
+});
+
+hospitalSchema.virtual( "admins", {
+    ref: "Admin",
+    localField: "_id",
+    foreignField: "hospital"
+});
 
 hospitalSchema.pre( 'save', async function (next) {
     const hospital = this;
@@ -40,6 +79,17 @@ hospitalSchema.pre( 'save', async function (next) {
         hospital.password = await bcrypt.hash( hospital.password, 8 );
     }
     
+    next();
+});
+
+hospitalSchema.pre( 'remove', async function (next) {
+    const hospital = this.hospital;
+
+    await Admin.deleteMany({ hospital});
+    await User.deleteMany({ hospital});
+    await Appointment.deleteMany({ hospital });
+    await Transaction.deleteMany({ hospital });
+
     next();
 });
 
